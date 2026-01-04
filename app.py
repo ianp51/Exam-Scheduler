@@ -1,45 +1,88 @@
-#study logic
+import streamlit as st
+import datetime
+
+# 1. Page Configuration
+st.set_page_config(page_title="Smart Study Planner 2026", page_icon="📅")
+
+# 2. Header
+st.title("📚 Smart Study Planner")
+st.subheader("Your personalized assistant created by Ian")
+
+# 3. Sidebar Inputs
+with st.sidebar:
+    st.header("Exam Details")
+    subject = st.text_input("What is the subject?", value="Computer Science")
+    # Date picker
+    exam_date = st.date_input("When is the exam?", datetime.date.today() + datetime.timedelta(days=7))
+    difficulty = st.slider("Difficulty Level (1-10):", 1, 10, 5)
+    st.divider()
+    st.info("Fill the details and click 'Generate Plan' to start.")
+
+# 4. Study Logic Calculations
 today = datetime.date.today()
 difference = exam_date - today
 days = difference.days + 1
 
-if st.button("Generate Plan"):
+# 5. Task Pools (Unique phrases to avoid repetition)
+struggle_tasks = [
+    "Focus on your weakest point by creating a mind map.",
+    "Watch a specific YouTube tutorial about a complex topic.",
+    "Use the Feynman Technique: explain the hardest topic to an imaginary student.",
+    "Solve 3 practice exercises from previous exams.",
+    "Write down the 5 most difficult concepts and memorize them.",
+    "Redraw confusing diagrams or charts from your notes.",
+    "Ask an AI or a friend to quiz you on your struggled topics."
+]
+
+review_tasks = [
+    "Do a quick summary of yesterday's notes.",
+    "Use Flashcards to test your basic knowledge.",
+    "Record yourself explaining a topic and listen to it later.",
+    "Skim through the textbook chapters you already know well.",
+    "Teach what you learned today to someone at home.",
+    "Rewrite your notes using colors for key terms (Active Recall).",
+    "Take a 10-minute quiz to keep the memory fresh."
+]
+
+# 6. Main Button and Output
+if st.button("Generate My Personalized Plan"):
     if days < 1:
         st.error("Please select a date in the future!")
     else:
         st.success(f"Plan created for {subject}!")
-        st.write(f"**Days left:** {days}")
         
-        # --- NEW: Progress Bar ---
+        # Visual Progress Bar
         max_days = 30 
         progress_value = max(0, min(100, (1 - (days / max_days)) * 100))
+        st.write(f"**Days left:** {days}")
         st.progress(int(progress_value))
         
-        #create a visual separator
         st.divider()
 
-        # --- NEW: Smart Phasing Logic ---
+        # 7. Smart Phasing Logic
         if days > 20:
-            #1. long term preparation
+            # PHASE 1: Long term preparation
             with st.expander("📅 PHASE 1: Deep Preparation (Slow Pace)"):
                 st.info("Since the exam is far away, focus on understanding the core concepts.")
-                st.write("- Read all materials and organize your index.")
+                st.write("- Read all materials and organize your notes.")
                 st.write("- Create mind maps and summaries.")
-                st.write("- Don't stress yet, just keep a steady rhythm.")
+                st.write("- Don't stress yet, keep a steady and calm rhythm.")
 
-            #2. the final 15 days countdown
             st.subheader("🏁 The Final 15 Days Countdown")
+            # Loop for the last 15 days with unique tasks
             for i in range(1, 16):
                 current_day = today + datetime.timedelta(days=i)
                 day_text = current_day.strftime("%d %b")
                 
                 with st.expander(f"Final Sprint - Day {i} ({day_text})"):
                     if i % 2 == 0:
-                        st.warning("🧠 **Focus on the topics you struggle with the most.**")
+                        task_idx = (i // 2) % len(struggle_tasks)
+                        st.warning(f"🧠 **Challenge:** {struggle_tasks[task_idx]}")
                     else:
-                        st.write("🔁 **Review** your summaries and watch research videos.")
+                        task_idx = (i // 2) % len(review_tasks)
+                        st.write(f"🔁 **Revision:** {review_tasks[task_idx]}")
         else:
-            #3. if exam is in a little amount of days
+            # SHORT TERM: Detailed plan for every day (Original Logic)
             for i in range(1, days + 1):
                 current_day = today + datetime.timedelta(days=i)
                 day_text = current_day.strftime("%d %b")
@@ -48,11 +91,17 @@ if st.button("Generate Plan"):
                     if i == days:
                         st.success("🏁 **Final review** and relax before the exam day.")
                     elif i == 1:
-                        st.info("📖 **Organize** your notes and do a quick summary.")
+                        st.info("📖 **Kickoff:** Organize your notes and do a quick summary.")
                     elif i % 2 == 0:
-                        st.warning("🧠 **Focus on the topics you struggle with the most.**")
+                        task_idx = (i // 2) % len(struggle_tasks)
+                        st.warning(f"🧠 **Challenge:** {struggle_tasks[task_idx]}")
                     else:
-                        st.write("🔁 **Review** what you did last lesson.")
+                        task_idx = (i // 2) % len(review_tasks)
+                        st.write(f"🔁 **Revision:** {review_tasks[task_idx]}")
 
-#instructions for user
-st.sidebar.info("Fill the details and click 'Generate Plan' to start studying.")
+        # 8. Export Feature
+        st.download_button(
+            label="💾 Download Plan as Text File",
+            data=f"Study Plan for {subject}\nTotal days: {days}\nGenerated by Ian's Smart Planner",
+            file_name=f"plan_{subject}.txt")
+
