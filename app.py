@@ -5,7 +5,7 @@ import datetime
 st.set_page_config(page_title="Study Planner for 2026", page_icon="📅")
 #sub title
 st.title("📚 Smart Study Planner")
-st.subheader("Your assistant for exam preparation created Ian")
+st.subheader("Your assistant for exam preparation created by Ian")
 
 #sidebar for inputs
 with st.sidebar:
@@ -27,24 +27,49 @@ if st.button("Generate Plan"):
         st.success(f"Plan created for {subject}!")
         st.write(f"**Days left:** {days}")
         
+        # --- NEW: Progress Bar ---
+        max_days = 30 
+        progress_value = max(0, min(100, (1 - (days / max_days)) * 100))
+        st.progress(int(progress_value))
+        
         #create a visual separator
         st.divider()
 
-        #loop with logic tips
-        for i in range(1, days + 1):
-            current_day = today + datetime.timedelta(days=i)
-            day_text = current_day.strftime("%d %b")
-            
-            #use 'expander' to make it look like a modern app
-            with st.expander(f"Session {i} - {day_text}"):
-                if i == days:
-                    st.write("🏁 **Final review** and relax before the exam day.")
-                elif i == 1:
-                    st.write("📖 **Organize** your notes and do a quick summary.")
-                elif i % 2 == 0:
-                    st.warning("🧠 **Focus on the topics you struggle with the most.**")
-                else:
-                    st.write("🔁 **Review** what you did last lesson.")
+        # --- NEW: Smart Phasing Logic ---
+        if days > 20:
+            # PHASE 1: Long term preparation
+            with st.expander("📅 PHASE 1: Deep Preparation (Slow Pace)"):
+                st.info("Since the exam is far away, focus on understanding the core concepts.")
+                st.write("- Read all materials and organize your index.")
+                st.write("- Create mind maps and summaries.")
+                st.write("- Don't stress yet, just keep a steady rhythm.")
+
+            # PHASE 2: The final 15 days countdown
+            st.subheader("🏁 The Final 15 Days Countdown")
+            for i in range(1, 16):
+                current_day = today + datetime.timedelta(days=i)
+                day_text = current_day.strftime("%d %b")
+                
+                with st.expander(f"Final Sprint - Day {i} ({day_text})"):
+                    if i % 2 == 0:
+                        st.warning("🧠 **Focus on the topics you struggle with the most.**")
+                    else:
+                        st.write("🔁 **Review** your summaries and watch research videos.")
+        else:
+            # SHORT TERM: Detailed plan for every day (Your original loop)
+            for i in range(1, days + 1):
+                current_day = today + datetime.timedelta(days=i)
+                day_text = current_day.strftime("%d %b")
+                
+                with st.expander(f"Session {i} - {day_text}"):
+                    if i == days:
+                        st.success("🏁 **Final review** and relax before the exam day.")
+                    elif i == 1:
+                        st.info("📖 **Organize** your notes and do a quick summary.")
+                    elif i % 2 == 0:
+                        st.warning("🧠 **Focus on the topics you struggle with the most.**")
+                    else:
+                        st.write("🔁 **Review** what you did last lesson.")
 
 #instructions for user
 st.sidebar.info("Fill the details and click 'Generate Plan' to start studying.")
