@@ -1,20 +1,3 @@
-import streamlit as st
-import datetime
-
-#title for the page and emoji setup
-st.set_page_config(page_title="Study Planner for 2026", page_icon="📅")
-#sub title
-st.title("📚 Smart Study Planner")
-st.subheader("Your assistant for exam preparation created by Ian")
-
-#sidebar for inputs
-with st.sidebar:
-    st.header("Exam Details")
-    subject = st.text_input("What is the subject?", value="Computer Science")
-    # Date picker: No more typing errors!
-    exam_date = st.date_input("When is the exam?", datetime.date.today() + datetime.timedelta(days=7))
-    difficulty = st.slider("Difficulty Level (1-10):", 1, 10, 5)
-
 #study logic
 today = datetime.date.today()
 difference = exam_date - today
@@ -37,14 +20,14 @@ if st.button("Generate Plan"):
 
         # --- NEW: Smart Phasing Logic ---
         if days > 20:
-            # PHASE 1: Long term preparation
+            #1. long term preparation
             with st.expander("📅 PHASE 1: Deep Preparation (Slow Pace)"):
                 st.info("Since the exam is far away, focus on understanding the core concepts.")
                 st.write("- Read all materials and organize your index.")
                 st.write("- Create mind maps and summaries.")
                 st.write("- Don't stress yet, just keep a steady rhythm.")
 
-            # PHASE 2: The final 15 days countdown
+            #2. the final 15 days countdown
             st.subheader("🏁 The Final 15 Days Countdown")
             for i in range(1, 16):
                 current_day = today + datetime.timedelta(days=i)
@@ -56,7 +39,7 @@ if st.button("Generate Plan"):
                     else:
                         st.write("🔁 **Review** your summaries and watch research videos.")
         else:
-            # SHORT TERM: Detailed plan for every day (Your original loop)
+            #3. if exam is in a little amount of days
             for i in range(1, days + 1):
                 current_day = today + datetime.timedelta(days=i)
                 day_text = current_day.strftime("%d %b")
@@ -73,3 +56,7 @@ if st.button("Generate Plan"):
 
 #instructions for user
 st.sidebar.info("Fill the details and click 'Generate Plan' to start studying.")
+
+#instructions for user
+st.sidebar.info("Fill the details and click 'Generate Plan' to start studying.")
+
