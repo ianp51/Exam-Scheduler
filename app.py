@@ -60,3 +60,4 @@ st.sidebar.info("Fill the details and click 'Generate Plan' to start studying.")
 #instructions for user
 st.sidebar.info("Fill the details and click 'Generate Plan' to start studying.")
 
+
